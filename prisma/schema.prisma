@@ -1,0 +1,64 @@
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id       String @id @default(uuid())
+  email    String @unique
+  password String
+}
+
+model Category {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  dishes Dish[]
+}
+
+model Dish {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  price       Float
+  imageUrl    String?
+  categoryId  Int
+  category    Category @relation(fields: [categoryId], references: [id])
+  orderItems  OrderItem[]
+}
+
+model Reservation {
+  id           Int      @id @default(autoincrement())
+  customerName String
+  phone        String
+  adults       Int
+  children     Int
+  bookingDate  DateTime
+  occasion     String?
+  notes        String?
+  status       String   @default("PENDING") // e.g., PENDING, CONFIRMED, CANCELLED
+}
+
+model Order {
+  id           Int      @id @default(autoincrement())
+  customerName String
+  phone        String
+  orderTime    DateTime @default(now())
+  totalPrice   Float
+  status       String   @default("PENDING")
+  items        OrderItem[]
+}
+
+model OrderItem {
+  id      Int   @id @default(autoincrement())
+  orderId Int
+  dishId  Int
+  quantity Int
+  order   Order @relation(fields: [orderId], references: [id])
+  dish    Dish  @relation(fields: [dishId], references: [id])
+}
