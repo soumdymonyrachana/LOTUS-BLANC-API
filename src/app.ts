@@ -6,6 +6,7 @@ import { specs } from "./swagger/swagger.js";
 import authRoutes from "./routes/authRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import orderItemRoutes from "./routes/orderItemRoutes.js";
 import dishRoutes from "./routes/dishRoutes.js"; 
 
 const app = express();
@@ -23,6 +24,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 app.use("/api/auth", authRoutes);
 app.use("/api/categories", categoryRoutes); 
 app.use("/api/orders", orderRoutes); 
+app.use("/api/order-items", orderItemRoutes); 
 app.use("/api/dishes", dishRoutes); 
 
 // Health check
