@@ -1,10 +1,27 @@
 import express from "express";
-// ... other imports
+import cors from "cors";
+import helmet from "helmet";
+import swaggerUi from "swagger-ui-express";
+import { specs } from "./swagger/swagger.js";
+import authRoutes from "./routes/authRoutes.js";
 
 const app = express();
-// ... your routes and middleware
+
+// Middleware
+app.use(helmet());
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Swagger
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
+
+// Routes
+app.use("/api/auth", authRoutes);
+
+// Health check
 app.get("/", (req, res) => {
-  res.send("Hello World");
+  res.send("Lotus Blanc API is running!");
 });
-// USE THIS:
+
 export default app;
