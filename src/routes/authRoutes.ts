@@ -1,19 +1,55 @@
-import prisma from "../lib/prisma.js";
+import { Router } from "express";
+import { handleLogin } from "../controllers/authController.js";
 
-// Make sure you use the EXACT name 'loginUser' here
-export const loginUser = async (req: any, res: any) => {
-  try {
-    const user = await prisma.user.findUnique({
-      where: { email: req.body.email },
-    });
+const router = Router();
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: Admin login
+ *     tags: [Auth]
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: lotusblanc@email.com
+ *               password:
+ *                 type: string
+ *                 example: 123123
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 userId:
+ *                   type: string
+ *                 token:
+ *                   type: string
+ *       401:
+ *         description: Invalid credentials
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ */
+router.post("/login", handleLogin);
 
-    return res.status(200).json({ user });
-  } catch (error) {
-    return res.status(500).json({ message: "Internal server error" });
-  }
-};
-// export default router // Removed because 'router' is not defined
+export default router;

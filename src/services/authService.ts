@@ -1,18 +1,32 @@
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import prisma from "../lib/prisma.js";
 
-// Make sure you use the EXACT name 'loginUser' here
-export const loginUser = async (req: any, res: any) => {
+const JWT_SECRET = process.env.JWT_SECRET || "fallback_secret";
+
+export const loginUser = async (email: string, password: string) => {
   try {
-    const user = await prisma.user.findUnique({
-      where: { email: req.body.email },
+    const user = await prisma.admin.findUnique({
+      where: { email },
     });
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return { success: false, message: "Admin not found" };
     }
 
-    return res.status(200).json({ user });
+    // Check password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return { success: false, message: "Invalid password" };
+    }
+
+    // Generate JWT token
+    const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, {
+      expiresIn: "24h",
+    });
+
+    return { success: true, userId: user.id, token };
   } catch (error) {
-    return res.status(500).json({ message: "Internal server error" });
+    return { success: false, message: "Internal server error" };
   }
 };
