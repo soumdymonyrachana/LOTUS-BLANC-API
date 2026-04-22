@@ -8,6 +8,7 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import orderItemRoutes from "./routes/orderItemRoutes.js";
 import dishRoutes from "./routes/dishRoutes.js"; 
+import reservationRoutes from "./routes/reservationRoutes.js";
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/orders", orderRoutes); 
 app.use("/api/order-items", orderItemRoutes); 
 app.use("/api/dishes", dishRoutes); 
+app.use("/api/reservations", reservationRoutes); 
 
 // Health check
 app.get("/", (req, res) => {
