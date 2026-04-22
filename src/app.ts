@@ -4,6 +4,7 @@ import helmet from "helmet";
 import swaggerUi from "swagger-ui-express";
 import { specs } from "./swagger/swagger.js";
 import authRoutes from "./routes/authRoutes.js";
+import categoryRoutes from "./routes/categoryRoutes.js";
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/categories", categoryRoutes); 
 
 // Health check
 app.get("/", (req, res) => {
