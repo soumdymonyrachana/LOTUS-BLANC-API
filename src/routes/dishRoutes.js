@@ -1,8 +1,6 @@
 import { Router } from "express";
 import * as dishController from "../controllers/dishController.js";
-
 const router = Router();
-
 /**
  * @swagger
  * components:
@@ -26,14 +24,12 @@ const router = Router();
  *         categoryId:
  *           type: integer
  */
-
 /**
  * @swagger
  * tags:
  *   - name: Dishes
  *     description: Menu item management
  */
-
 /// ========================
 /// GET ALL DISHES
 /// ========================
@@ -59,7 +55,6 @@ const router = Router();
  *         description: Dish not found
  */
 router.get("/:id", dishController.getDishById);
-
 /// ========================
 /// UPDATE DISH
 /// ========================
@@ -88,7 +83,6 @@ router.get("/:id", dishController.getDishById);
  *         description: Dish not found
  */
 router.put("/:id", dishController.updateDish);
-
 /// ========================
 /// DELETE DISH
 /// ========================
@@ -111,7 +105,6 @@ router.put("/:id", dishController.updateDish);
  *         description: Dish not found
  */
 router.delete("/:id", dishController.removeDish);
-
 /// ========================
 /// GET ALL DISHES (general route after specific)
 /// ========================
@@ -126,7 +119,6 @@ router.delete("/:id", dishController.removeDish);
  *         description: List of all dishes
  */
 router.get("/", dishController.getDishes);
-
 /// ========================
 /// CREATE DISH
 /// ========================
@@ -147,5 +139,5 @@ router.get("/", dishController.getDishes);
  *         description: Dish created successfully
  */
 router.post("/", dishController.postDish);
-
 export default router;
+//# sourceMappingURL=dishRoutes.js.map
