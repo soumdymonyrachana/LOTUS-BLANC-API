@@ -33,15 +33,16 @@ model Dish {
 }
 
 model Reservation {
-  id           Int      @id @default(autoincrement())
-  customerName String
-  phone        String
-  adults       Int
-  children     Int
-  bookingDate  DateTime
-  occasion     String?
-  notes        String?
-  status       String   @default("PENDING") // e.g., PENDING, CONFIRMED, CANCELLED
+  id            Int      @id @default(autoincrement())
+  customerName  String
+  phone         String
+  adults        Int
+  children      Int
+  bookingDate   DateTime
+  time          String   // 👈 add this
+  occasion      String?
+  notes         String?
+  status        String
 }
 
 model Order {
@@ -52,6 +53,7 @@ model Order {
   totalPrice   Float
   status       String   @default("PENDING")
   items        OrderItem[]
+  
 }
 
 model OrderItem {
