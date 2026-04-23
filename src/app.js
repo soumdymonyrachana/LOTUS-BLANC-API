@@ -7,31 +7,26 @@ import authRoutes from "./routes/authRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import orderItemRoutes from "./routes/orderItemRoutes.js";
-import dishRoutes from "./routes/dishRoutes.js"; 
+import dishRoutes from "./routes/dishRoutes.js";
 import reservationRoutes from "./routes/reservationRoutes.js";
-
 const app = express();
-
 // Middleware
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 // Swagger
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
-
 // Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/categories", categoryRoutes); 
-app.use("/api/orders", orderRoutes); 
-app.use("/api/order-items", orderItemRoutes); 
-app.use("/api/dishes", dishRoutes); 
-app.use("/api/reservations", reservationRoutes); 
-
+app.use("/api/categories", categoryRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/order-items", orderItemRoutes);
+app.use("/api/dishes", dishRoutes);
+app.use("/api/reservations", reservationRoutes);
 // Health check
 app.get("/", (req, res) => {
-  res.send("Lotus Blanc API is running!");
+    res.send("Lotus Blanc API is running!");
 });
-
 export default app;
+//# sourceMappingURL=app.js.map
