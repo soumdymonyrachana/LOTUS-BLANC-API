@@ -6,11 +6,11 @@ const prisma = new PrismaClient();
 export const createOrder = async (data: {
   customerName: string;
   phone: string;
-  totalPrice: number;
   items: { dishId: number; quantity: number }[];
 }) => {
-  // Validate dishes (parallel for performance)
-  await Promise.all(
+  // Validate dishes and calculate total price
+  let totalPrice = 0;
+  const validatedItems = await Promise.all(
     data.items.map(async (item) => {
       const dish = await prisma.dish.findUnique({
         where: { id: item.dishId },
@@ -19,6 +19,9 @@ export const createOrder = async (data: {
       if (!dish) {
         throw new Error(`Dish with id ${item.dishId} not found`);
       }
+
+      totalPrice += dish.price * item.quantity;
+      return item;
     })
   );
 
@@ -26,10 +29,10 @@ export const createOrder = async (data: {
     data: {
       customerName: data.customerName,
       phone: data.phone,
-      totalPrice: data.totalPrice,
+      totalPrice: totalPrice,
       status: "PENDING",
       items: {
-        create: data.items.map((item) => ({
+        create: validatedItems.map((item) => ({
           dishId: item.dishId,
           quantity: item.quantity,
         })),
@@ -79,6 +82,12 @@ export const updateOrderStatus = async (id: number, status: string) => {
 
 // DELETE
 export const deleteOrder = async (id: number) => {
+  // First delete all order items associated with this order
+  await prisma.orderItem.deleteMany({
+    where: { orderId: id },
+  });
+
+  // Then delete the order
   return await prisma.order.delete({
     where: { id },
   });
