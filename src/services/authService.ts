@@ -4,29 +4,61 @@ import prisma from "../lib/prisma.js";
 
 const JWT_SECRET = process.env.JWT_SECRET || "fallback_secret";
 
-export const loginUser = async (email: string, password: string) => {
+// REGISTER ADMIN
+// export const registerAdmin = async (email: string, password: string) => {
+//   const existing = await prisma.admin.findUnique({
+//     where: { email },
+//   });
+
+//   if (existing) {
+//     return { success: false, message: "Admin already exists" };
+//   }
+
+//   const hashedPassword = await bcrypt.hash(password, 10);
+
+//   const admin = await prisma.admin.create({
+//     data: {
+//       email,
+//       password: hashedPassword,
+//     },
+//   });
+
+//   return {
+//     success: true,
+//     adminId: admin.id,
+//   };
+// };
+
+// LOGIN ADMIN (Admin-only authentication)
+export const loginAdmin = async (email: string, password: string) => {
   try {
-    const user = await prisma.admin.findUnique({
+    const admin = await prisma.admin.findUnique({
       where: { email },
     });
 
-    if (!user) {
+    if (!admin) {
       return { success: false, message: "Admin not found" };
     }
 
-    // Check password
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcrypt.compare(password, admin.password);
+
     if (!isPasswordValid) {
       return { success: false, message: "Invalid password" };
     }
 
-    // Generate JWT token
-    const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, {
-      expiresIn: "24h",
-    });
+    const token = jwt.sign(
+      { adminId: admin.id, email: admin.email, role: "admin" },
+      JWT_SECRET,
+      { expiresIn: "24h" }
+    );
 
-    return { success: true, userId: user.id, token };
+    return {
+      success: true,
+      adminId: admin.id,
+      token,
+    };
   } catch (error) {
+    console.error(error);
     return { success: false, message: "Internal server error" };
   }
 };
