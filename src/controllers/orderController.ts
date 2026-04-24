@@ -4,7 +4,7 @@ import * as orderService from "../services/orderService.js";
 // CREATE
 export const postOrder = async (req: Request, res: Response) => {
   try {
-    const { customerName, phone, totalPrice, items } = req.body;
+    const { customerName, phone, items } = req.body;
 
     if (!items || items.length === 0) {
       return res.status(400).json({ error: "Order must have at least one item" });
@@ -13,7 +13,6 @@ export const postOrder = async (req: Request, res: Response) => {
     const order = await orderService.createOrder({
       customerName,
       phone,
-      totalPrice,
       items,
     });
 
