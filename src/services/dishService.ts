@@ -27,6 +27,28 @@ export const getDishById = async (id: number) => {
 
 // CREATE DISH
 export const createDish = async (data: DishInput) => {
+  // Validation
+  if (!data.name || typeof data.name !== "string" || data.name.trim() === "") {
+    throw new Error("Name is required and must be a non-empty string");
+  }
+  if (
+    !data.description ||
+    typeof data.description !== "string" ||
+    data.description.trim() === ""
+  ) {
+    throw new Error("Description is required and must be a non-empty string");
+  }
+  if (typeof data.price !== "number" || data.price <= 0) {
+    throw new Error("Price is required and must be a positive number");
+  }
+  if (
+    !data.categoryId ||
+    typeof data.categoryId !== "number" ||
+    data.categoryId <= 0
+  ) {
+    throw new Error("CategoryId is required and must be a positive integer");
+  }
+
   return prisma.dish.create({
     data,
     include: { category: true }
@@ -50,7 +72,7 @@ export const updateDish = async (id: number, data: Partial<DishInput>) => {
   });
 };
 
-// DELETE DISH
+// DELETE DISH (✅ FIXED)
 export const deleteDish = async (id: number) => {
   const dish = await prisma.dish.findUnique({
     where: { id }
@@ -60,6 +82,12 @@ export const deleteDish = async (id: number) => {
     throw new Error("Dish not found");
   }
 
+  // 🔥 remove related order items FIRST (fix foreign key error)
+  await prisma.orderItem.deleteMany({
+    where: { dishId: id }
+  });
+
+  // then delete the dish
   return prisma.dish.delete({
     where: { id },
     include: { category: true }
