@@ -22,7 +22,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
 // Routes
-app.use("/api/auth", authRoutes);
+app.use("/auth", authRoutes);
 app.use("/api/categories", categoryRoutes); 
 app.use("/api/orders", orderRoutes); 
 app.use("/api/order-items", orderItemRoutes); 

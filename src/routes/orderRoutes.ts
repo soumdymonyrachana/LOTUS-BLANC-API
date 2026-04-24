@@ -15,16 +15,14 @@ const router = Router();
  * /api/orders:
  *   get:
  *     summary: List all orders
- *     tags:
- *       - Orders
+ *     tags: [Orders]
  *     responses:
  *       200:
  *         description: Successfully retrieved orders
  *
  *   post:
  *     summary: Place a new order
- *     tags:
- *       - Orders
+ *     tags: [Orders]
  *     requestBody:
  *       required: true
  *       content:
@@ -58,11 +56,70 @@ const router = Router();
  *     responses:
  *       201:
  *         description: Order placed successfully
- *       400:
- *         description: Invalid input
+ */
+
+/**
+ * @swagger
+ * /api/orders/{id}:
+ *   get:
+ *     summary: Get order by ID
+ *     tags: [Orders]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Order found
+ *       404:
+ *         description: Order not found
+ *
+ *   delete:
+ *     summary: Delete order
+ *     tags: [Orders]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Deleted successfully
+ */
+
+/**
+ * @swagger
+ * /api/orders/{id}/status:
+ *   patch:
+ *     summary: Update order status
+ *     tags: [Orders]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Status updated
  */
 
 router.get("/", orderController.getOrders);
+router.get("/:id", orderController.getOrderById);
 router.post("/", orderController.postOrder);
+router.patch("/:id/status", orderController.updateOrderStatus);
+router.delete("/:id", orderController.deleteOrder);
 
 export default router;
