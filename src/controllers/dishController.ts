@@ -37,13 +37,10 @@ export const getDishById = async (req: Request, res: Response) => {
 // ======================
 export const postDish = async (req: Request, res: Response) => {
   try {
-    console.log("Creating dish with body:", req.body);
     const dish = await dishService.createDish(req.body);
     res.status(201).json(dish);
-  } catch (error) {
-    console.error("Error creating dish:", error);
-    const message = error instanceof Error ? error.message : "Error creating dish";
-    res.status(400).json({ message });
+  } catch {
+    res.status(400).json({ message: "Error creating dish" });
   }
 };
 
