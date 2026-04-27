@@ -1,35 +1,82 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const getAllDishes = async () => {
-  return await prisma.dish.findMany({
-    include: { category: true }, // Logic: Joins with Category table
-  });
-};
-
-export const createDish = async (data: {
+interface DishInput {
   name: string;
   description: string;
   price: number;
   imageUrl?: string;
   categoryId: number;
-}) => {
-  return await prisma.dish.create({
+}
+
+// GET ALL DISHES
+export const getAllDishes = async () => {
+  return prisma.dish.findMany({
+    where: {
+      isDeleted: false
+    },
+    include: { category: true }
+  });
+};
+
+// GET DISH BY ID
+export const getDishById = async (id: number) => {
+  return prisma.dish.findFirst({
+    where: {
+      id,
+      isDeleted: false
+    },
+    include: { category: true }
+  });
+};
+
+// CREATE DISH
+export const createDish = async (data: DishInput) => {
+  return prisma.dish.create({
     data,
     include: { category: true }
   });
 };
 
-export const updateDish = async (id: number, data: any) => {
-  return await prisma.dish.update({
+// UPDATE DISH
+export const updateDish = async (id: number, data: Partial<DishInput>) => {
+  const dish = await prisma.dish.findFirst({
+    where: {
+      id,
+      isDeleted: false
+    }
+  });
+
+  if (!dish) {
+    throw new Error("Dish not found");
+  }
+
+  return prisma.dish.update({
     where: { id },
     data,
+    include: { category: true }
   });
 };
 
+// DELETE DISH (SOFT DELETE)
 export const deleteDish = async (id: number) => {
-  return await prisma.dish.delete({
+  const dish = await prisma.dish.findFirst({
+    where: {
+      id,
+      isDeleted: false
+    }
+  });
+
+  if (!dish) {
+    throw new Error("Dish not found");
+  }
+
+  return prisma.dish.update({
     where: { id },
+    data: {
+      isDeleted: true
+    },
+    include: { category: true }
   });
 };
