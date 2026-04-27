@@ -1,30 +1,22 @@
 import type { Request, Response } from "express";
 import * as dishService from "../services/dishService.js";
 
-// ======================
-// GET ALL DISHES
-// ======================
+// GET ALL
 export const getDishes = async (_req: Request, res: Response) => {
   try {
-    const dishes = await dishService.getAllDishes();
-    res.json(dishes);
+    const data = await dishService.getAllDishes();
+    res.json(data);
   } catch {
     res.status(500).json({ message: "Error fetching dishes" });
   }
 };
 
-// ======================
-// GET ONE DISH
-// ======================
+// GET ONE
 export const getDishById = async (req: Request, res: Response) => {
   try {
-    const id = Number(req.params.id);
+    const dish = await dishService.getDishById(Number(req.params.id));
 
-    const dish = await dishService.getDishById(id);
-
-    if (!dish) {
-      return res.status(404).json({ message: "Dish not found" });
-    }
+    if (!dish) return res.status(404).json({ message: "Not found" });
 
     res.json(dish);
   } catch {
@@ -32,57 +24,43 @@ export const getDishById = async (req: Request, res: Response) => {
   }
 };
 
-// ======================
-// CREATE DISH
-// ======================
+// CREATE
 export const postDish = async (req: Request, res: Response) => {
   try {
     const dish = await dishService.createDish(req.body);
     res.status(201).json(dish);
-  } catch {
+  } catch (err) {
+    console.log(err);
     res.status(400).json({ message: "Error creating dish" });
   }
 };
 
-// ======================
-// UPDATE DISH
-// ======================
+// UPDATE
 export const updateDish = async (req: Request, res: Response) => {
   try {
-    const id = Number(req.params.id);
-
-    const updatedDish = await dishService.updateDish(id, req.body);
-
-    res.json(updatedDish);
-  } catch (error: any) {
-    if (error.message === "Dish not found") {
-      return res.status(404).json({ message: error.message });
-    }
-
-    res.status(400).json({ message: error.message || "Error updating dish" });
+    const dish = await dishService.updateDish(Number(req.params.id), req.body);
+    res.json(dish);
+  } catch (err: any) {
+    res.status(400).json({ message: err.message });
   }
 };
 
-// ======================
-// DELETE DISH (SOFT DELETE)
-// ======================
+// PATCH
+export const patchDish = async (req: Request, res: Response) => {
+  try {
+    const dish = await dishService.patchDish(Number(req.params.id), req.body);
+    res.json(dish);
+  } catch (err: any) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+// DELETE
 export const removeDish = async (req: Request, res: Response) => {
   try {
-    const id = Number(req.params.id);
-
-    const deletedDish = await dishService.deleteDish(id);
-
-    res.json({ 
-      message: "Dish deleted successfully",
-      data: deletedDish 
-    });
-  } catch (error: any) {
-    if (error.message === "Dish not found") {
-      return res.status(404).json({ message: error.message });
-    }
-
-    res.status(400).json({
-      message: error.message || "Error deleting dish"
-    });
+    await dishService.deleteDish(Number(req.params.id));
+    res.json({ message: "Deleted successfully" });
+  } catch {
+    res.status(400).json({ message: "Error deleting dish" });
   }
 };

@@ -28,8 +28,8 @@ model Dish {
   price       Float
   imageUrl    String?
   categoryId  Int
-  category    Category @relation(fields: [categoryId], references: [id])
-  orderItems  OrderItem[]
+  isPublic    Boolean  @default(true)
+  isDeleted   Boolean  @default(false)
 }
 
 model Reservation {
