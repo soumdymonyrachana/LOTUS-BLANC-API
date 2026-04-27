@@ -5,11 +5,19 @@ const router = Router();
 
 /**
  * @swagger
- * /api/auth/login:
+ * tags:
+ *   - name: Auth
+ *     description: Authentication API
+ */
+
+/**
+ * @swagger
+ * /auth/login:
  *   post:
- *     summary: Admin login
- *     tags: [Auth]
- *     security: []
+ *     tags:
+ *       - Auth
+ *     summary: Admin login (Admin-only)
+ *     description: Authenticate admin user and return JWT token. Only admins can login.
  *     requestBody:
  *       required: true
  *       content:
@@ -22,33 +30,25 @@ const router = Router();
  *             properties:
  *               email:
  *                 type: string
- *                 example: lotusblanc@email.com
+ *                 format: email
  *               password:
  *                 type: string
- *                 example: 123123
  *     responses:
  *       200:
- *         description: Login successful
+ *         description: Admin login successful, returns JWT token
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 message:
- *                   type: string
- *                 userId:
+ *                 adminId:
  *                   type: string
  *                 token:
  *                   type: string
- *       401:
- *         description: Invalid credentials
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
  *                 message:
  *                   type: string
+ *       401:
+ *         description: Admin not found or invalid credentials
  */
 router.post("/login", handleLogin);
 

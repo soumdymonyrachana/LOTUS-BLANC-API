@@ -1,4 +1,5 @@
 import swaggerJsdoc from "swagger-jsdoc";
+import path from "path";
 
 const options = {
   definition: {
@@ -6,26 +7,17 @@ const options = {
     info: {
       title: "Lotus Blanc API",
       version: "1.0.0",
-      description: "API documentation for our reservation and ordering system",
+      description: "API documentation for reservation system",
     },
     servers: [
       {
         url: "http://localhost:8000",
-        description: "Development server",
       },
     ],
-    components: {
-      securitySchemes: {
-        bearerAuth: {
-          type: "http",
-          scheme: "bearer",
-          bearerFormat: "JWT",
-        },
-      },
-    },
-    security: [{ bearerAuth: [] }],
   },
-  apis: ["./src/routes/*.ts"],
+
+  // ✅ FIX: this is the KEY problem
+  apis: [path.join(process.cwd(), "src/routes/*.ts")],
 };
 
 export const specs = swaggerJsdoc(options);

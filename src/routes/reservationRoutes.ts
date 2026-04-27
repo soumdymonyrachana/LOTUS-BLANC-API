@@ -6,8 +6,8 @@ const router = Router();
 /**
  * @swagger
  * tags:
- *   - name: Reservations
- *     description: Table booking management
+ *   name: Reservations
+ *   description: Reservation management API
  */
 
 /**
@@ -15,16 +15,19 @@ const router = Router();
  * /api/reservations:
  *   get:
  *     summary: Get all reservations
- *     tags:
- *       - Reservations
+ *     tags: [Reservations]
  *     responses:
  *       200:
- *         description: List of bookings
- *
+ *         description: List of reservations
+ */
+router.get("/", reservationController.listReservations);
+
+/**
+ * @swagger
+ * /api/reservations:
  *   post:
- *     summary: Create a new reservation
- *     tags:
- *       - Reservations
+ *     summary: Create reservation
+ *     tags: [Reservations]
  *     requestBody:
  *       required: true
  *       content:
@@ -43,9 +46,9 @@ const router = Router();
  *               phone:
  *                 type: string
  *               adults:
- *                 type: integer
+ *                 type: number
  *               children:
- *                 type: integer
+ *                 type: number
  *               bookingDate:
  *                 type: string
  *                 format: date-time
@@ -57,16 +60,52 @@ const router = Router();
  *       201:
  *         description: Created successfully
  */
-router.get("/", reservationController.listReservations);
 router.post("/", reservationController.postReservation);
+
+/**
+ * @swagger
+ * /api/reservations/{id}:
+ *   get:
+ *     summary: Get reservation by ID
+ *     tags: [Reservations]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Success
+ */
+router.get("/:id", reservationController.getReservationById);
+
+/**
+ * @swagger
+ * /api/reservations/{id}:
+ *   put:
+ *     summary: Update reservation
+ *     tags: [Reservations]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *     responses:
+ *       200:
+ *         description: Updated
+ */
+router.put("/:id", reservationController.updateReservation);
 
 /**
  * @swagger
  * /api/reservations/{id}/status:
  *   patch:
- *     summary: Update reservation status (CONFIRMED, CANCELLED, etc.)
- *     tags:
- *       - Reservations
+ *     summary: Update reservation status
+ *     tags: [Reservations]
  *     parameters:
  *       - in: path
  *         name: id
@@ -87,9 +126,26 @@ router.post("/", reservationController.postReservation);
  *                 example: CONFIRMED
  *     responses:
  *       200:
- *         description: Status updated successfully
+ *         description: Updated
  */
-
 router.patch("/:id/status", reservationController.patchStatus);
+
+/**
+ * @swagger
+ * /api/reservations/{id}:
+ *   delete:
+ *     summary: Delete reservation
+ *     tags: [Reservations]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Deleted successfully
+ */
+router.delete("/:id", reservationController.deleteReservation);
 
 export default router;
