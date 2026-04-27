@@ -1,39 +1,61 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const createReservation = async (data: {
-  customerName: string;
-  phone: string;
-  adults: number;
-  children: number;
-  bookingDate: string | Date;
-  occasion?: string;
-  notes?: string;
-}) => {
-  return await prisma.reservation.create({
+export type ReservationStatus = "PENDING" | "CONFIRMED" | "CANCELLED";
+
+// CREATE
+export const createReservation = async (data: any) => {
+  return prisma.reservation.create({
     data: {
       ...data,
-      bookingDate: new Date(data.bookingDate), // Ensure it's a Date object
+      bookingDate: new Date(data.bookingDate),
+      status: "PENDING",
     },
   });
 };
 
+// READ ALL
 export const getReservations = async () => {
-  return await prisma.reservation.findMany({
-    orderBy: { bookingDate: 'desc' },
+  return prisma.reservation.findMany({
+    orderBy: { bookingDate: "desc" },
   });
 };
 
-export const updateReservationStatus = async (id: number, status: string) => {
-  return await prisma.reservation.update({
+// READ BY ID
+export const getReservationById = async (id: number) => {
+  return prisma.reservation.findUnique({
+    where: { id },
+  });
+};
+
+// UPDATE FULL
+export const updateReservation = async (id: number, data: any) => {
+  return prisma.reservation.update({
+    where: { id },
+    data: {
+      ...data,
+      bookingDate: data.bookingDate
+        ? new Date(data.bookingDate)
+        : undefined,
+    },
+  });
+};
+
+// UPDATE STATUS
+export const updateReservationStatus = async (
+  id: number,
+  status: ReservationStatus,
+) => {
+  return prisma.reservation.update({
     where: { id },
     data: { status },
   });
 };
 
+// DELETE
 export const deleteReservation = async (id: number) => {
-  return await prisma.reservation.delete({
+  return prisma.reservation.delete({
     where: { id },
   });
 };
