@@ -27,18 +27,9 @@ model Dish {
   description String
   price       Float
   imageUrl    String?
-
   categoryId  Int
-  category    Category @relation(fields: [categoryId], references: [id])
-
-  orderItems  OrderItem[]
-
-  // ✅ Soft delete support
+  isPublic    Boolean  @default(true)
   isDeleted   Boolean  @default(false)
-
-  // ✅ Recommended for real apps
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
 }
 
 model Reservation {

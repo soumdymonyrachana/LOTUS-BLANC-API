@@ -125,6 +125,7 @@ router.put("/:id", reservationController.updateReservation);
  *                 type: string
  *                 example: CONFIRMED
  *     responses:
+ *
  *       200:
  *         description: Updated
  */

@@ -2,66 +2,240 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-interface DishInput {
+export interface DishInput {
   name: string;
   description: string;
   price: number;
-  imageUrl?: string;
+  imageUrl?: string | null;
   categoryId: number;
 }
 
-// GET ALL DISHES
+// ======================
+// HELPERS
+// ======================
+const validatePrice = (price: unknown): number => {
+  const parsed = Number(price);
+
+  if (isNaN(parsed) || parsed < 0) {
+    throw new Error("Invalid price");
+  }
+
+  return parsed;
+};
+
+const validateCategory = async (categoryId: number) => {
+  const category = await prisma.category.findUnique({
+    where: { id: Number(categoryId) },
+  });
+
+  if (!category) {
+    throw new Error("Category not found");
+  }
+
+  return category;
+};
+
+// ======================
+// GET ALL
+// ======================
 export const getAllDishes = async () => {
-  return prisma.dish.findMany({
-    include: { category: true }
+  return await prisma.dish.findMany({
+    where: {
+      isDeleted: false,
+    },
+    include: {
+      category: true,
+    },
+    orderBy: {
+      id: "desc",
+    },
   });
 };
 
-// GET DISH BY ID
+// ======================
+// GET BY ID
+// ======================
 export const getDishById = async (id: number) => {
-  return prisma.dish.findUnique({
-    where: { id },
-    include: { category: true }
+  if (isNaN(id)) {
+    throw new Error("Invalid dish ID");
+  }
+
+  return await prisma.dish.findFirst({
+    where: {
+      id,
+      isDeleted: false,
+    },
+    include: {
+      category: true,
+    },
   });
 };
 
-// CREATE DISH
+// ======================
+// CREATE
+// ======================
 export const createDish = async (data: DishInput) => {
-  return prisma.dish.create({
-    data,
-    include: { category: true }
+  if (!data.name?.trim()) {
+    throw new Error("Dish name is required");
+  }
+
+  if (!data.description?.trim()) {
+    throw new Error("Dish description is required");
+  }
+
+  if (data.categoryId === undefined || data.categoryId === null) {
+    throw new Error("Category ID is required");
+  }
+
+  const validPrice = validatePrice(data.price);
+
+  await validateCategory(data.categoryId);
+
+  return await prisma.dish.create({
+    data: {
+      name: data.name.trim(),
+      description: data.description.trim(),
+      price: validPrice,
+      imageUrl: data.imageUrl || null,
+      category: {
+        connect: {
+          id: Number(data.categoryId),
+        },
+      },
+    },
+    include: {
+      category: true,
+    },
   });
 };
 
-// UPDATE DISH
+// ======================
+// UPDATE (PUT)
+// ======================
 export const updateDish = async (id: number, data: Partial<DishInput>) => {
-  const dish = await prisma.dish.findUnique({
-    where: { id }
+  if (isNaN(id)) {
+    throw new Error("Invalid dish ID");
+  }
+
+  const existingDish = await prisma.dish.findFirst({
+    where: {
+      id,
+      isDeleted: false,
+    },
   });
 
-  if (!dish) {
+  if (!existingDish) {
     throw new Error("Dish not found");
   }
 
-  return prisma.dish.update({
+  if (!data.name?.trim()) {
+    throw new Error("Dish name is required");
+  }
+
+  if (!data.description?.trim()) {
+    throw new Error("Dish description is required");
+  }
+
+  if (data.price === undefined) {
+    throw new Error("Price is required");
+  }
+
+  const validPrice = validatePrice(data.price);
+
+  if (data.categoryId !== undefined) {
+    await validateCategory(data.categoryId);
+  }
+
+  return await prisma.dish.update({
     where: { id },
-    data,
-    include: { category: true }
+    data: {
+      name: data.name.trim(),
+      description: data.description.trim(),
+      price: validPrice,
+      imageUrl: data.imageUrl ?? null,
+      category:
+        data.categoryId !== undefined
+          ? {
+              connect: {
+                id: Number(data.categoryId),
+              },
+            }
+          : undefined,
+    },
+    include: {
+      category: true,
+    },
   });
 };
 
-// DELETE DISH
-export const deleteDish = async (id: number) => {
-  const dish = await prisma.dish.findUnique({
-    where: { id }
+// ======================
+// PATCH
+// ======================
+export const patchDish = async (id: number, data: Partial<DishInput>) => {
+  if (isNaN(id)) {
+    throw new Error("Invalid dish ID");
+  }
+
+  const existingDish = await prisma.dish.findFirst({
+    where: {
+      id,
+      isDeleted: false,
+    },
   });
 
-  if (!dish) {
+  if (!existingDish) {
     throw new Error("Dish not found");
   }
 
-  return prisma.dish.delete({
+  if (data.categoryId !== undefined) {
+    await validateCategory(data.categoryId);
+  }
+
+  return await prisma.dish.update({
     where: { id },
-    include: { category: true }
+    data: {
+      name: data.name ? data.name.trim() : undefined,
+      description: data.description ? data.description.trim() : undefined,
+      price: data.price !== undefined ? validatePrice(data.price) : undefined,
+      imageUrl: data.imageUrl !== undefined ? data.imageUrl : undefined,
+      category:
+        data.categoryId !== undefined
+          ? {
+              connect: {
+                id: Number(data.categoryId),
+              },
+            }
+          : undefined,
+    },
+    include: {
+      category: true,
+    },
+  });
+};
+
+// ======================
+// DELETE (SOFT DELETE)
+// ======================
+export const deleteDish = async (id: number) => {
+  if (isNaN(id)) {
+    throw new Error("Invalid dish ID");
+  }
+
+  const existingDish = await prisma.dish.findFirst({
+    where: {
+      id,
+      isDeleted: false,
+    },
+  });
+
+  if (!existingDish) {
+    throw new Error("Dish not found");
+  }
+
+  return await prisma.dish.update({
+    where: { id },
+    data: {
+      isDeleted: true,
+    },
   });
 };

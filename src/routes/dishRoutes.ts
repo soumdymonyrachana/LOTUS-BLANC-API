@@ -25,6 +25,8 @@ const router = Router();
  *           type: string
  *         categoryId:
  *           type: integer
+ *         isPublic:
+ *           type: boolean
  */
 
 /**
@@ -37,8 +39,41 @@ const router = Router();
 /// ========================
 /// GET ALL DISHES
 /// ========================
+/**
+ * @swagger
+ * /api/dishes:
+ *   get:
+ *     summary: Get all dishes
+ *     tags: [Dishes]
+ *     responses:
+ *       200:
+ *         description: List of dishes
+ */
+router.get("/", dishController.getDishes);
+
 /// ========================
-/// GET ONE DISH (specific route before general)
+/// CREATE DISH
+/// ========================
+/**
+ * @swagger
+ * /api/dishes:
+ *   post:
+ *     summary: Create a new dish
+ *     tags: [Dishes]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Dish'
+ *     responses:
+ *       201:
+ *         description: Created successfully
+ */
+router.post("/", dishController.postDish);
+
+/// ========================
+/// GET ONE DISH
 /// ========================
 /**
  * @swagger
@@ -61,13 +96,13 @@ const router = Router();
 router.get("/:id", dishController.getDishById);
 
 /// ========================
-/// UPDATE DISH
+/// UPDATE FULL DISH (PUT)
 /// ========================
 /**
  * @swagger
  * /api/dishes/{id}:
  *   put:
- *     summary: Update a dish
+ *     summary: Update a dish completely
  *     tags: [Dishes]
  *     parameters:
  *       - in: path
@@ -83,11 +118,49 @@ router.get("/:id", dishController.getDishById);
  *             $ref: '#/components/schemas/Dish'
  *     responses:
  *       200:
- *         description: Dish updated successfully
- *       404:
- *         description: Dish not found
+ *         description: Updated successfully
  */
 router.put("/:id", dishController.updateDish);
+
+/// ========================
+/// PATCH DISH (PARTIAL UPDATE)
+// ========================
+/**
+ * @swagger
+ * /api/dishes/{id}:
+ *   patch:
+ *     summary: Partially update dish (toggle public/private, etc.)
+ *     tags: [Dishes]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               price:
+ *                 type: number
+ *               categoryId:
+ *                 type: integer
+ *               imageUrl:
+ *                 type: string
+ *               isPublic:
+ *                 type: boolean
+ *     responses:
+ *       200:
+ *         description: Updated successfully
+ */
+router.patch("/:id", dishController.patchDish);
 
 /// ========================
 /// DELETE DISH
@@ -106,46 +179,8 @@ router.put("/:id", dishController.updateDish);
  *           type: integer
  *     responses:
  *       200:
- *         description: Dish deleted successfully
- *       404:
- *         description: Dish not found
+ *         description: Deleted successfully
  */
 router.delete("/:id", dishController.removeDish);
-
-/// ========================
-/// GET ALL DISHES (general route after specific)
-/// ========================
-/**
- * @swagger
- * /api/dishes:
- *   get:
- *     summary: Get all dishes
- *     tags: [Dishes]
- *     responses:
- *       200:
- *         description: List of all dishes
- */
-router.get("/", dishController.getDishes);
-
-/// ========================
-/// CREATE DISH
-/// ========================
-/**
- * @swagger
- * /api/dishes:
- *   post:
- *     summary: Create a new dish
- *     tags: [Dishes]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/Dish'
- *     responses:
- *       201:
- *         description: Dish created successfully
- */
-router.post("/", dishController.postDish);
 
 export default router;
